@@ -1,0 +1,30 @@
+@startuml register_ucesace
+scale 800*800
+
+left to right direction
+
+skinparam packageStyle rectangle
+
+actor "Клиент" as customer 
+actor "Оператор" as clerk 
+
+
+rectangle "Система" {
+  (Регистрация) as (Register)
+  (Ввод данных) as (InfoInput)
+  (Основные данные) as (GeneralInfo)
+  (Данные для оплаты) as (PaymentInfo)
+  (Оповещение) as (Notify)
+
+  customer -- (Register)
+
+  (Register) .> (InfoInput)
+  (InfoInput) .> (GeneralInfo)
+  (InfoInput) .> (PaymentInfo)
+
+  (Register) .> (Notify)
+}
+
+(Notify) -- clerk
+
+@enduml

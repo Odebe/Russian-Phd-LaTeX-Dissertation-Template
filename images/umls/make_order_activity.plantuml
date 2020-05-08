@@ -1,0 +1,22 @@
+@startuml make_order_activity
+scale 800*800
+
+start
+
+
+:Открытие страницы регистрации;
+:Ввод основных данных клиента;
+:Ввод данных для оплаты;
+
+
+
+if (Graphviz installed?) then (yes)
+  :process all\ndiagrams;
+else (no)
+  :process only
+  __sequence__ and __activity__ diagrams;
+endif
+
+stop
+
+@enduml

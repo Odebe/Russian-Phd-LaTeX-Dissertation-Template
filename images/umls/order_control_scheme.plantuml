@@ -1,0 +1,56 @@
+@startuml order_control_scheme
+scale 800*800
+
+node "Rails приложение" {
+
+  interface ActiveRecord
+  interface "Показать заказа" as show_request
+  interface "Оформить заказ" as create_request
+  interface "Закончить обслуживание" as deprovision_request
+
+  node "Компонент управления заказами" {
+    node Orders {
+      node Show {
+        [Endpoint] as e1
+        e1 <-left-> [Presenter]
+        e1 ..> [Filter]
+        [Filter] ..> ActiveRecord
+      }
+
+      node Create {
+        [Endpoint] as e2
+        e2 .left.> [Contract]
+        e2 ..> [Save]
+        [Save] ..> ActiveRecord
+      }
+
+      node Deprovision {
+        [Endpoint] as e3
+        [Update] as u1
+        e3 .down.> u1
+        u1 ..> ActiveRecord
+      }
+
+      node UpdateState {
+        [Endpoint] as e4
+        [Update] as u2
+        e4 .down.> u2
+        u2 ..> ActiveRecord
+      }
+    }
+
+    show_request <-down-> e1
+    create_request <-down-> e2
+    deprovision_request <-down-> e3
+  }
+
+  node "Компонент управления ВМ" {
+    interface "Создать ВМ" as vm_create
+    interface "Оповещение о изменении статуса" as change_state_signal
+  }
+
+  change_state_signal -up-> e4
+  e2 -down..> vm_create
+}
+
+@enduml

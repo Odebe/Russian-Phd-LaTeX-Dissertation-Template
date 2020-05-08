@@ -1,0 +1,25 @@
+@startuml make_order_usecase
+scale 800*800
+
+left to right direction
+
+skinparam packageStyle rectangle
+
+actor "Клиент" as customer 
+
+rectangle "Система виртуализации" {
+  (Создание ВМ) as (VmCreation)
+}
+
+rectangle "Система" {
+  (Оформление заказа) as (Ordermaking)
+  (Выбор конфигурации ВМ) as (ConfigSelect)
+  (Выбор операционной системы) as (OsSelect)
+
+  customer -- (Ordermaking)
+
+  (Ordermaking) .> (ConfigSelect)
+  (Ordermaking) .> (OsSelect)
+  (Ordermaking) .> (VmCreation)
+}
+@enduml

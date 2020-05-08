@@ -1,0 +1,40 @@
+@startuml application_scheme
+scale 800*800
+
+interface "HTTP\HTTPS" as http
+
+node "Rails приложение" {
+  http -down- [ActionController]
+
+  [Компонент управления заказами] as [order_control]
+  [Компонент управления ВМ] as [vm_control]
+  [Адаптер системы виртуализации] as [virt_adapter]
+  [Компонент управления пользователями] as [user_control]
+  [Компонент тарификации заказов] as [order_tarification]
+  [Компонент формирования отчёта] as [report_generator]
+
+  [order_control] ..> [ActionModel]
+  [order_control] ..> [vm_control]
+
+  [user_control] ..> [ActionModel]
+  [order_tarification] ..> [ActionModel]
+  [report_generator] ..> [ActionMailer]
+  [report_generator] ..> [ActionModel]
+  [vm_control] ..> [ActionModel]
+
+  [ActionController] <---> [order_control]
+  [ActionController] <---> [user_control]
+  [ActionController] <---> [order_tarification]
+  [ActionController] <---> [report_generator]
+
+  [vm_control] ..> [virt_adapter]
+}
+
+interface "Почтовый сервер" as mail_server
+interface "Система виртуализации" as virt_system
+
+[ActionMailer] -down- mail_server
+[ActionModel] -down- СУБД
+[virt_adapter] -down- virt_system
+
+@enduml
