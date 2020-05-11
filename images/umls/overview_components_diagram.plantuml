@@ -17,15 +17,20 @@ node "Почтовый сервер" {
   [Exim]
 }
 
+node "Яндекс.Касса" {
+  [JSON API] as json_api
+}
+
 node "Сервер приложения" {
   [nginx] --> [Unicorn]
   [Unicorn] --> [Rails]
   [Rails] --> [Redis]
   [Sidekiq] --> [Redis]
   [Sidekiq] --> [Rails]
-  [Rails] -right--> [PostgreSQL]
-  [Rails] ---> [OpenStack]
-  [Rails] --> [Exim]
+  [Rails] -down-> [PostgreSQL]
+  [Rails] -down-> [OpenStack]
+  [Rails] -right-> [Exim]
+  [Rails] -right-> json_api
 }
 
 @enduml

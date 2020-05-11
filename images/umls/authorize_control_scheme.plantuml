@@ -1,0 +1,34 @@
+@startuml authorize_control_scheme
+scale 800*800
+
+node "Rails приложение" {
+  interface ActiveRecord
+
+  interface "Запрос проверки" as request
+
+  node "Компонент управления авторизацией" {
+    [Endpoint] as e1
+    [Выбор политики] as policy_finder
+    [Проверка политики] as policy_checker
+    
+    node "Политики" {
+      [Политика 1] as p1
+      [Политика 2] as p2
+      [Политика ...] as p3
+      [Политика N] as pn
+    }
+
+    e1 -down-> policy_finder
+    policy_finder -down-> policy_checker
+
+    policy_finder .down.> p1
+    policy_finder .down.> p2
+    policy_finder .down.> p3
+    policy_finder .down.> pn
+  }
+
+  request -down-> e1
+  e1 .down.> ActiveRecord
+}
+
+@enduml

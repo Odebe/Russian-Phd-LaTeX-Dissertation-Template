@@ -10,28 +10,40 @@ node "Rails приложение" {
   [Компонент управления ВМ] as [vm_control]
   [Адаптер системы виртуализации] as [virt_adapter]
   [Компонент управления пользователями] as [user_control]
+  [Компонент управления аккаунтами] as [account_control]
   [Компонент тарификации заказов] as [order_tarification]
   [Компонент формирования отчёта] as [report_generator]
+  [Компонент управления авторизацией] as [policy_control]
+  [Адаптер платежной системы] as [bank_adapter]
+
 
   [order_control] ..> [ActionModel]
   [order_control] ..> [vm_control]
 
+  [user_control] ..> [account_control]
+
   [user_control] ..> [ActionModel]
   [order_tarification] ..> [ActionModel]
-  [report_generator] ..> [ActionMailer]
+  [report_generator] .down.> [ActionMailer]
   [report_generator] ..> [ActionModel]
   [vm_control] ..> [ActionModel]
 
-  [ActionController] <---> [order_control]
-  [ActionController] <---> [user_control]
+  [ActionController] <-right-> [order_control]
+  [ActionController] <-down-> [user_control]
   [ActionController] <---> [order_tarification]
   [ActionController] <---> [report_generator]
+  [ActionController] <-right-> [policy_control]
 
   [vm_control] ..> [virt_adapter]
 }
 
 interface "Почтовый сервер" as mail_server
 interface "Система виртуализации" as virt_system
+interface "Платёжная система" as bank
+
+account_control .down.> bank_adapter
+
+bank_adapter --> bank
 
 [ActionMailer] -down- mail_server
 [ActionModel] -down- СУБД

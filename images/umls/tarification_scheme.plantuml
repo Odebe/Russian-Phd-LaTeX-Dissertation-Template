@@ -1,0 +1,37 @@
+@startuml tarification_scheme
+scale 800*800
+
+node "Rails приложение" {
+
+  interface ActiveRecord
+
+  interface "Сигнал начала сбора записей" as tariff_request
+
+  node "Компонент тарификации" {
+    node Tarification {
+      [Calculate] as calc
+      [Endpoint] as endpoint
+      [FindOrder] as find_order
+      [FindOrderTariff] as find_order_tariff
+      [FindVmConfiguration] as find_vm_config
+      [FindVm] as find_vm
+      [Save] as save
+  }
+
+  tariff_request ---> endpoint
+  endpoint ..> calc
+
+  calc ..> find_order_tariff
+  find_order_tariff .down.> find_order
+
+  calc ..> find_vm_config
+  find_vm_config ..> find_vm
+  
+  endpoint ..> save
+
+  save ..> ActiveRecord
+  find_order ..> ActiveRecord
+  find_vm ..> ActiveRecord
+}
+
+@enduml

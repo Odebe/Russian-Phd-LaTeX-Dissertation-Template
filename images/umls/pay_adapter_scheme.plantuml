@@ -1,0 +1,16 @@
+@startuml pay_adapter_scheme
+scale 800*800
+
+node "Rails приложение" {
+  node "Адаптер системы оплаты" {
+    [JSON API клиент] as http_client
+  }
+}
+
+node "Яндекс.Касса" {
+  interface "https://payment.yandex.net/api/v3/" as api
+}
+
+http_client ---> api
+
+@enduml

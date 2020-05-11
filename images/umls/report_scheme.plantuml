@@ -1,0 +1,34 @@
+@startuml report_scheme
+scale 800*800
+
+node "Rails приложение" {
+  interface ActiveRecord
+  interface "Запрос отчёта" as request
+
+  node "Компонент управления отчётами" {
+    node Reports {
+
+      node Agregation {
+        [Fetch] as fetch
+        [Group] as group_
+      }
+
+      [Endpoint] as e
+      [Generate] as gen
+      [Send] as send
+      
+      e -down-> fetch
+      fetch ..> ActiveRecord
+      fetch -right-> group_
+      group_ -left-> gen
+      gen -up-> send
+    }
+
+    [ActionMailer] as mailer
+  }
+
+  send --> mailer
+  request -right-> e
+}
+
+@enduml

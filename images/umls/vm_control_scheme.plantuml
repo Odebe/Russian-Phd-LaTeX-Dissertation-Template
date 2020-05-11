@@ -1,0 +1,58 @@
+@startuml vm_control_scheme
+scale 800*800
+
+node "Rails приложение" {
+
+  interface "Создать ВМ" as create_vm_app
+  interface "Показать ВМ" as show_vm_app
+  interface "Удалить ВМ" as delete_vm_app
+
+  node "Компонент управления ВМ" {
+    node Vms {
+      node Show {
+        [Endpoint] as e1
+        e1 .left.> [Filter]
+      }
+
+      node Create {
+        [Endpoint] as e2
+        e2 .left.> [Contract]
+      }
+
+      node Delete {
+        [Endpoint] as e3
+        e3 .left.> [Validation]
+      }
+    }
+  }
+
+  node "Адаптер системы виртуализации" {
+    interface "Создать ВМ" as vm_create_adapter
+    interface "Запросить актуальные данные ВМ" as vm_show_adapter
+    interface "Удалить ВМ" as vm_delete_adapter
+
+    interface "JSON API клиент" as http_client
+  }
+
+  show_vm_app -down-> e1
+  create_vm_app -down-> e2
+  delete_vm_app -down-> e3
+
+  e1 .down-> vm_show_adapter
+  e2 .down-> vm_create_adapter
+  e3 .down-> vm_delete_adapter
+}
+
+node "Система виртуализации" {
+  interface "JSON API" as json
+}
+
+interface "JSON API" as json
+
+vm_show_adapter -down-> http_client
+vm_create_adapter -down-> http_client
+vm_delete_adapter -down-> http_client
+
+http_client -down-> json
+
+@enduml

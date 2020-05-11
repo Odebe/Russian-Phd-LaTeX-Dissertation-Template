@@ -1,0 +1,45 @@
+@startuml accounts_control_scheme
+scale 800*800
+
+node "Платёжная система" {
+  interface "JSON API" as api
+}
+
+node "Rails приложение" {
+  interface ActiveRecord
+
+  interface "Запрос проверки" as check_request
+  interface "Запрос создания" as create_request
+  interface "Запрос остановки использования аккаунта" as stop_request
+
+  node "Компонент управления аккаунтами" {
+    node "Accounts" {
+      node "Create" {
+        [Endpoint] as e1
+      }
+
+      node "Check" {
+        [Endpoint] as e2
+        [Check] as e2_check
+        
+        e2 ..> e2_check
+        e2_check -down-> api
+      }
+
+      node "Stop" {
+        [Endpoint] as e3
+      }
+
+      e1 ..> e2
+    }
+
+  create_request -down-> e1
+  check_request -down-> e2
+  stop_request -down-> e3
+
+  e1 .down.> ActiveRecord
+  e2 .down.> ActiveRecord
+  e3 .down.> ActiveRecord
+}
+
+@enduml

@@ -1,0 +1,45 @@
+@startuml users_control_scheme
+scale 800*800
+
+node "Rails приложение" {
+
+  interface ActiveRecord
+
+  interface "Завести пользователя" as create_vm_app
+  interface "Показать пользователя" as show_vm_app
+  interface "Заморозить клиента" as delete_vm_app
+
+  node "Компонент управления аккаунтами" {
+    interface "Завести аккаунт для оплаты" as account
+  }
+
+  node "Компонент управления пользователями" {
+    node Users {
+      node Show {
+        [Endpoint] as e1
+        e1 .left.> [Filter]
+      }
+
+      node Create {
+        [Endpoint] as e2
+        e2 .left.> [Contract]
+        e2 ---> account
+      }
+
+      node Deactivate {
+        [Endpoint] as e3
+        e3 .left.> [Validation]
+      }
+    }
+  }
+
+  show_vm_app -down-> e1
+  create_vm_app -down-> e2
+  delete_vm_app -down-> e3
+
+  e1 -down-> ActiveRecord
+  e2 -down-> ActiveRecord
+  e3 -down-> ActiveRecord
+}
+
+@enduml
