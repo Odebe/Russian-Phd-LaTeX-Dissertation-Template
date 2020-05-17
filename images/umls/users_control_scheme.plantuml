@@ -9,10 +9,6 @@ node "Rails приложение" {
   interface "Показать пользователя" as show_vm_app
   interface "Заморозить клиента" as delete_vm_app
 
-  node "Компонент управления аккаунтами" {
-    interface "Завести аккаунт для оплаты" as account
-  }
-
   node "Компонент управления пользователями" {
     node Users {
       node Show {
@@ -23,7 +19,6 @@ node "Rails приложение" {
       node Create {
         [Endpoint] as e2
         e2 .left.> [Contract]
-        e2 ---> account
       }
 
       node Deactivate {

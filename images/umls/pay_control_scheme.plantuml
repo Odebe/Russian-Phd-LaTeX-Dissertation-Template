@@ -1,0 +1,30 @@
+@startuml pay_control_scheme
+scale 800*800
+
+node "Rails приложение" {
+  interface ActiveRecord
+  ' interface "Запрос отчёта" as request
+
+  node "Адаптер системы оплаты" {
+    [Создать платёж] as pay_request
+    [Проверка статуса платежа] as pay_check
+  }
+
+  node "Компонент управления платежами" {
+    node Accounts {
+      node Create {
+        [Endpoint] as e1
+        e1 -down-> pay_request
+        e1 --> ActiveRecord
+      }
+
+      node Check {
+        [Endpoint] as e2
+        e2 -down-> pay_check
+        e2 --> ActiveRecord
+      }
+    }
+  }
+}
+
+@enduml
