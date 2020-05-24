@@ -146,9 +146,6 @@
 
 \subsection{Компонент тарификации заказов}\label{sec:subs9}
 Данный компонент отвечает за тарификацию заказов. Заказы тарифицируются с помощью фоновой задачи, которая запускается каждый час.
-Для каждого заказа сохраняется в БД <<ресурсная запись>> - запись о том, какое колчество определённого ресурса (cpu, ram, hdd) за час было потреблено заказлм с какой стоимостью и в рамках какого тарифа.
-
-Данная схема позволяет составлять отчёты вне контекста заказов - тольпро ресурсы и конфигурации.
 
 На рисунке~\ref{fig:tarification_scheme} показана диаграмма компонента тарификации.
 \begin{figure}[ht]
@@ -158,30 +155,479 @@
   \caption{Диаграмма компонента тарификации}\label{fig:tarification_scheme}
 \end{figure}
 
-\section{Концептуальная модель базы данных}\label{sec:ch4/sect3}
+\section{Схема базы данных}\label{sec:ch4/sect3}
+\subsection{Схема БД}\label{sec:subs10}
 
-% \section{Компонент управления заказами}\label{sec:ch4/sect1}
+На рисунке~\ref{fig:logic_scheme} показана схема БД.
+\begin{figure}[ht]
+  \centerfloat{
+    \includegraphics[scale=0.5]{db/logic_scheme}
+  }
+  \caption{Схема БД}\label{fig:logic_scheme}
+\end{figure}
 
 
-% \section{Компонент управления заказами}\label{sec:ch4/sect1}
-% \section{Компонент формирования отчётов}\label{sec:ch4/sect2}
-% \section{Компонент работы с системой виртуализации}\label{sec:ch4/sect3}
-% \section{Компонент тарификации заказов}\label{sec:ch4/sect4}
+\subsection{Таблица заказов}\label{sec:subs10}
+На таблице ~\ref{tab:orders_table} указаны аргументы таблицы заказов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы заказов}%
+    \label{tab:orders_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  номер заказа & int & 123 \\ \hline
+        user\_id &  id клиента (внешний ключ) & int & 123 \\ \hline
+        vm\_configuration\_id &  id конфигурации & int & 123 \\ \hline
+        approver\_id & id оператора & int & 123 \\ \hline
+        approved\_at & дата подтверждения заказа & datetime & 2020-01-05 \\ \hline
+        created\_at & дата создания заказа & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
 
-% \section{Диаграммы вариантов использования}\label{sec:ch4/sect1}
-% \subsection{Создание аккаунта пользователя}\label{sec:subs12}
-% \subsection{Создание заказа}\label{sec:subs13}
-% \subsection{Управление заказом}\label{sec:subs14}
+\subsection{Таблица пользователей}\label{sec:subs11}
+На таблице ~\ref{tab:users_table} указаны аргументы таблицы пользователей.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы пользователей}%
+    \label{tab:users_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  номер клиента & int & 2 \\ \hline
+        login &  логин клиента & string & test\_user \\ \hline
+        pass\_hash &  хэш пароля  & string & 9f86d081884c7d65 \\ \hline
+        type & тип пользоватя  & string & operator \\ \hline
+        created\_at & дата создания записи & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
 
-% \section{Диаграммы последовательностей}\label{sec:ch4/sect2}
-% \subsection{Создание аккаунта пользователя}\label{sec:subs21}
-% \subsection{Создание заказа}\label{sec:subs22}
-% \subsection{Управление заказом}\label{sec:subs23}
+\subsection{Таблица локаций пользователей}\label{sec:subs12}
+На таблице ~\ref{tab:locations_table} указаны аргументы таблицы локаций пользователей.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы локаций пользователей}%
+    \label{tab:locations_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        user\_id &  id клиента & int & 123 \\ \hline
+        street\_line\_1  &  Первая линия адреса  & string & г. Москва, ул. Нижегородская \\ \hline
+        street\_line\_2  &  Вторая линия адреса  & string & дом 123, кв 105 \\ \hline
+        city  &  Город  & string & Москва \\ \hline
+        region  &  Регион  & string & Москва \\ \hline
+        postcode  &  Почтовый индекс  & string & 19035 \\ \hline
+        created\_at & дата создания записи & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
 
-% \section{Диаграмма состояний объектов системы}\label{sec:ch4/sect3}
-% \subsection{Аккаунт пользователя}\label{sec:subs31}
-% \subsection{Заказ}\label{sec:subs32}
+\subsection{Таблица персональных данных пользователей}\label{sec:subs13}
+На таблице ~\ref{tab:person_table} указаны аргументы таблицы персональных данных пользователей.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы персональных данных пользователей}%
+    \label{tab:person_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        user\_id &  id клиента & int & 123 \\ \hline
+        first\_name  &  Имя  & string & Иван \\ \hline
+        second\_name  &  Фамилия  & string & Иванов \\ \hline
+        middle\_name  &  Отчество  & string & Иванович \\ \hline
+        birth\_day  &  День рождения  & int & 1 \\ \hline
+        birth\_month  &  Месяц рождения  & int & 1 \\ \hline
+        birth\_year  &  Год рождения  & int & 1991 \\ \hline
+        created\_at & дата создания записи & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
 
-% \section{Концептуальная модель базы данных}\label{sec:ch4/sect4}
-% \section{Архитектура системы(?)}\label{sec:ch4/sect5}
 
+\subsection{Таблица платежей}\label{sec:subs14}
+На таблице ~\ref{tab:payments_table} указаны аргументы таблицы платежей
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы платежей}%
+    \label{tab:payments_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        cost & сумма платежа & jsonb & \{"cents": 100, "currency\_iso": "RUB"\} \\ \hline
+        description & описание & text & Платёж для заказа 1 \\ \hline
+        user\_id & id клиента & int & 1 \\ \hline
+        order\_id & id заказа & int & 1 \\ \hline
+        period\_days & период тарификации & int & 30 \\ \hline
+        period\_start\_date & отсчёт периода тарификации & datetime & 2020-01-05 \\ \hline
+        created\_at & дата создания записи & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+\subsection{Таблица конфигураций ВМ}\label{sec:subs15}
+На таблице ~\ref{tab:vm_conf_table} указаны аргументы таблицы конфигураций ВМ.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы конфигураций ВМ}%
+    \label{tab:vm_conf_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        name & название конфигураций & string & Конфигурация S \\ \hline
+        desc & описание конфигураций & text & Базовая конфигурация \\ \hline
+        % created\_at & дата создания записи & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+\subsection{Таблица периодов тарификаци}\label{sec:subs16}
+На таблице ~\ref{tab:vm_conf_table} указаны аргументы таблицы периодов тарификации.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы периодов тарификации}%
+    \label{tab:vm_conf_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        days & кол-во дней & int & 30 \\ \hline
+        desc & описание & text & Ежемесячная плата \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+
+\subsection{Таблица тарифов конфигураций}\label{sec:subs17}
+На таблице ~\ref{tab:tariff_table} указаны аргументы таблицы тарифов конфигураций.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы тарифов конфигурации}%
+    \label{tab:tariff_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id &  id записи & int & 2 \\ \hline
+        pay\_period\_id & id периода тарификации & int & 30 \\ \hline
+        cost & сумма платежа & jsonb & \{"cents": 100, "currency\_iso": "RUB"\} \\ \hline
+        vm\_configuration\_id & id конфигурации & int & 30 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(resources, "resources\n(Ресурс)") {
+%   primary_key(code) - код ресурса
+%   name - название
+% }
+\subsection{Таблица ресурсов}\label{sec:subs18}
+На таблице ~\ref{tab:resource_table} указаны аргументы таблицы ресурсов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы ресурсов}%
+    \label{tab:resource_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        code &  код ресурса & string & ram \\ \hline
+        name & название & string & RAM \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+
+% Table(resource_values, "resource_values\n(Значение ресурса)") {
+%   primary_key(resource_code) - код ресурса
+%   primary_key(vm_configuration_id) - id конфигурации
+%   value - значение
+%   value_type - тип значения
+% }
+\subsection{Таблица значений ресурсов}\label{sec:subs19}
+На таблице ~\ref{tab:resource_value_table} указаны аргументы таблицы значений ресурсов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы значений ресурсов}%
+    \label{tab:resource_value_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        resource\_code & код ресурса & string & ram \\ \hline
+        vm\_configuration\_id & id монфигурации & id & 123 \\ \hline
+        value & значение & string & 123 \\ \hline
+        value\_type & тип значения & string & int \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(reports, "reports\n(Отчёты)") {
+%   primary_key(id) - id отчёта
+%   name - название
+%   ' filepath - путь к файлу
+%   created_at - время создания записи
+%   report_type_code - код типа отчёта
+% }
+\subsection{Таблица отчётов}\label{sec:subs20}
+На таблице ~\ref{tab:reports_table} указаны аргументы таблицы отчётов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы отчётов}%
+    \label{tab:reports_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id & номер отчёта & int & 123 \\ \hline
+        name & название & string & тестовый отчёт \\ \hline
+        created\_at & время создания & datetime & 2020-01-06 \\ \hline
+        report\_type\_code & код типа отчёта & string & basic\_report \\ \hline 
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(report_values, "report_values\n(Значение отчёта)") {
+%   primary_key(id) - id записи
+%   value_type_code - код типа значения
+%   value - значение
+% }
+\subsection{Таблица значений отчёта}\label{sec:subs21}
+На таблице ~\ref{tab:reports_values_table} указаны аргументы таблицы значений отчётов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы значений отчётов}%
+    \label{tab:reports_values_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id & id записи & int & 123 \\ \hline
+        value & значение & string & asdasd \\ \hline
+        value\_type\_code & код типа значения & string & basic\_cpu\_value \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(report_value_types, "report_value_types\n(Типы значений\nотчёта)") {
+%   primary_key(type_code) - код типа
+%   name - название
+%   strategy - стратегия вычисления\n значения данного типа
+% }
+\subsection{Таблица типов значений отчёта}\label{sec:subs22}
+На таблице ~\ref{tab:reports_values_table} указаны аргументы таблицы значений отчётов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы типов значений отчёта}%
+    \label{tab:reports_values_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        type\_code & код типа & string & basic\_cpu\_value \\ \hline
+        name & название & string & базовая формула RAM \\ \hline
+        strategy & стратегия подсчёта & string & BasicRamStrategy \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+
+% Table(collect_sessions, "collect_session\n(Сессия сбора\n оплат)") {
+%   primary_key(id) - id записи
+%   result_status - статус выгрузки
+%   created_at - дата создания отчёта
+% }
+\subsection{Таблица сессий сбора}\label{sec:subs23}
+На таблице ~\ref{tab:collect_table} указаны аргументы таблицы сессий сбора.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы сессий сбора}%
+    \label{tab:collect_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id & id записи & int & 123 \\ \hline
+        result\_status & конечный статус & string & success \\ \hline
+        created\_at & дата создания & datetime & 2020-01-05 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(error_logs, "error_logs\n(Ошибки важных\nпроцессов)") {
+%   primary_key(id) - id записи
+%   error_message - сообщение
+%   error_backtrace - стек выполнения
+%   process_type_code - код типа процесса
+%   process_id - id процесса
+% }
+\subsection{Таблица ошибок важных процессов}\label{sec:subs24}
+На таблице ~\ref{tab:errors_table} указаны аргументы таблицы ошибок.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы ошибок}%
+    \label{tab:errors_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id & id записи & int & 123 \\ \hline
+        error\_message & сообщение ошибки & text & divided by 0 (ZeroDivisionError) \\ \hline
+        error\_backtrace & стэк ошибки & text & division\_service.rb:9:in `/': \\ \hline
+        process\_type\_code & код процесса & string & payments\_collect \\ \hline
+        process\_id & id процесса & int & 123123 \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(process_types, "process_types\n(Тип процесса\nс описанием)") {
+%   primary_key(code) - код поцесса
+%   name - название
+%   desc - описание
+% }
+\subsection{Таблица типов процессов}\label{sec:subs25}
+На таблице ~\ref{tab:process_types_table} указаны аргументы таблицы типов процессов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы ошибок}%
+    \label{tab:process_types_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        code & код процесса & string & report \\ \hline
+        name & название & string & Отчёт \\ \hline
+        desc & описание & text & Базовый отчёт о потреблённых ресурсах \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+
+% Table(order_snapshots, "order_snapshots\n(Слепки заказов \nс тарифами)") {
+%   primary_key(id) - номер
+%   payment_id - номер платежа
+%   order_params - поля заказа в jsonb
+%   configuration_params - параметра конфигурации в jsonb
+% }
+\subsection{Таблица слепков заказов}\label{sec:subs26}
+На таблице ~\ref{tab:order_snap_table} указаны аргументы таблицы слепков заказов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы слепков заказов}%
+    \label{tab:order_snap_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        id & id записи & int & 123 \\ \hline
+        payment\_id & id записи платы & id & 333 \\ \hline
+        order\_params & селпок параметров заказа & jsonb & \{\} \\ \hline
+        configuration\_params & селпок параметров конфигурации заказа & jsonb & \{\} \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}
+
+% Table(report_types, "report_types\n(Типы отчётов)") {
+%   primary_key(type_code) - код типа отчёта
+%   name - название
+%   desc - описание 
+% }
+\subsection{Таблица типов отчётов}\label{sec:subs27}
+На таблице ~\ref{tab:report_types_table} указаны аргументы таблицы типов отчётов.
+\begin{table} [htbp]% Пример записи таблицы с номером, но без отображаемого наименования
+  \centering
+  \begin{threeparttable}% выравнивание подписи по границам таблицы
+    \caption{Аргументы таблицы типов отчётов}%
+    \label{tab:report_types_table}%
+    \setlength\extrarowheight{2pt} %вот этим управляем расстоянием между рядами, \arraystretch даёт неудачный результат
+    \setlength{\tymin}{1.9cm}% минимальная ширина столбца
+    \begin{SingleSpace}
+      \begin{tabulary}{\textwidth}{|@{}| >{\zz}C | >{\zz}C | >{\zz}C | >{\zz}C @{} |}
+        \hline
+        Название & Описание & Тип & Пример \\ \hline
+        type\_code & код типа отчёта & string & base\_type \\ \hline
+        name & название & string & Отчёт \\ \hline
+        desc & описание & text & Базовый отчёт о потреблённых ресурсах \\ \hline
+      \end{tabulary}%
+    \end{SingleSpace}
+  \end{threeparttable}
+\end{table}

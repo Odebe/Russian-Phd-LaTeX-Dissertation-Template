@@ -1,0 +1,198 @@
+@startuml logic_scheme
+
+scale 1000*1000
+' uncomment the line below if you're using computer with a retina display
+' skinparam dpi 300
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+' we use bold for primary key
+' green color for unique
+' and underscore for not_null
+!define primary_key(x) <b>x</b>
+' !define unique(x) <color:green>x</color>
+' !define not_null(x) <u>x</u>
+' other tags available:
+' <i></i>
+' <back:COLOR></color>, where color is a color name or html color code
+' (#FFAACC)
+' see: http://plantuml.com/classes.html#More
+hide methods
+hide stereotypes
+
+' entities
+
+Table(orders, "orders\n(Заказы)") {
+  primary_key(id) - Номер заказа
+  user_id - Id клиента
+  approver_id - Id оператора
+  approved_at - Время подтверждения
+  created_at - Время создания
+}
+
+Table(users, "users\n(Пользователи)") {
+  primary_key(id) - Номер клиента
+  login - логин
+  pass_hash - хэш пароля
+  type - тип пользователя
+  created_at - время создания записи
+}
+
+Table(locations, "locations\n(Локация пользователя)") {
+  primary_key(id) - Номер
+  user_id - номер клиента
+  street_line_1 - адрес линия 1
+  street_line_2 - адрес линия 2
+  city - город
+  region - регион
+  postcode - почтовый индекс
+  created_at - время создания записи
+}
+
+Table(personal_records, "personal_records \n(Перс. данные пользователя)") {
+  primary_key(id) - Номер
+  user_id - номер клиента
+  first_name - имя
+  second_name - фамилия
+  midle_name - отчество
+  birth_day - день рождения
+  birth_month - месяц рождения
+  birth_year - год рождения
+  created_at - время создания записи клиента
+}
+
+Table(payments, "payments\n(Платежи)") {
+  primary_key(id) - номер
+  cost - сложное значение в jsonb
+  description - описание платежа
+  user_id - номер пользователя
+  order_id - номер заказа
+  period_days - период тарификации
+  period_start_date - день начала эксплуатации для этого платежа
+}
+
+Table(vm_configurations, "vm_configurations\n(Конфигурации ВМ)"){
+  primary_key(id) - id
+  name - название
+  desc - описание
+}
+
+Table(pay_periods, "pay_periods\n(Период тарификаци)"){
+  primary_key(id) - id
+  primary_key(days) - кол-во дней
+  desc - описание
+}
+
+Table(tariffs, "tariffs\n(Тариф (стоииость) конфигурации)") {
+  primary_key(id) - id
+  pay_period_id - номер периода
+  cost - сложное значение в jsonb
+  vm_configuration_id - id конфигурации
+}
+
+Table(resources, "resources\n(Ресурс)") {
+  primary_key(code) - код ресурса
+  name - название
+}
+
+Table(resource_values, "resource_values\n(Значение ресурса)") {
+  primary_key(resource_code) - код ресурса
+  primary_key(vm_configuration_id) - id конфигурации
+  value - значение
+  value_type - тип значения
+}
+
+Table(reports, "reports\n(Отчёты)") {
+  primary_key(id) - id отчёта
+  name - название
+  ' filepath - путь к файлу
+  created_at - время создания записи
+  report_type_code - код типа отчёта
+}
+
+Table(report_values, "report_values\n(Значение отчёта)") {
+  primary_key(id) - id записи
+  value_type_code - код типа значения
+  value - значение
+}
+
+Table(report_value_types, "report_value_types\n(Типы значений\nотчёта)") {
+  primary_key(type_code) - код типа
+  name - название
+  strategy - стратегия вычисления\n значения данного типа
+}
+
+Table(collect_sessions, "collect_session\n(Сессия сбора\n оплат)") {
+  primary_key(id) - id записи
+  result_status - статус выгрузки
+  created_at - дата создания отчёта
+}
+
+Table(error_logs, "error_logs\n(Ошибки важных\nпроцессов)") {
+  primary_key(id) - id записи
+  error_message - сообщение
+  error_backtrace - стек выполнения
+  process_type_code - код типа процесса
+  process_id - id процесса
+}
+
+Table(process_types, "process_types\n(Тип процесса\nс описанием)") {
+  primary_key(code) - код поцесса
+  name - название
+  desc - описание
+}
+
+Table(order_snapshots, "order_snapshots\n(Слепки заказов \nс тарифами)") {
+  primary_key(id) - номер
+  payment_id - номер платежа
+  order_params - поля заказа в jsonb
+  configuration_params - параметра конфигурации в jsonb
+}
+
+Table(report_types, "report_types\n(Типы отчётов)") {
+  primary_key(type_code) - код типа отчёта
+  name - название
+  desc - описание 
+}
+
+resources "1" -- "*" resource_values
+resource_values "*" -- "1" vm_configurations 
+vm_configurations "1" -- "*" tariffs
+tariffs "1" -- "1" pay_periods
+
+users "1" -- "*" payments 
+users "1" -- "*" orders
+orders "1" -- "*" payments
+vm_configurations "1" -left- "*" orders
+
+locations "1" -left- "1" users
+
+report_value_types "1" -left- "*" report_values 
+reports "1" -- "*" report_values
+report_values "*" -- "1" orders
+report_values "*" -- "1" users
+
+collect_sessions "1" -- "*" error_logs
+reports "1" -- "*" error_logs
+process_types "1" -- "*" error_logs
+
+payments "1" -right- "1" order_snapshots
+' orders "*" -- "1" order_snapshots
+' users "1" -- "*" order_snapshots
+users "1" -up- "1" personal_records
+
+collect_sessions "1" -- "*" payments
+
+report_types "1" -- "*" reports
+
+' email_messages
+' relationships
+' one-to-one relationship
+' user -- user_profile : "A user only \nhas one profile"
+' ' one to may relationship
+' user --> session : "A user may have\n many sessions"
+' ' many to many relationship
+' ' Add mark if you like
+' user "1" --> "*" user_group : "A user may be \nin many groups"
+' group "1" --> "0..N" user_group : "A group may \ncontain many users"
+
+
+@enduml

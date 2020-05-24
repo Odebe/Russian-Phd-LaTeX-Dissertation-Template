@@ -1,0 +1,74 @@
+@startuml concept_scheme
+
+scale 800*800
+' uncomment the line below if you're using computer with a retina display
+' skinparam dpi 300
+!define Table(name,desc) class name as "desc" << (T,#FFAAAA) >>
+' we use bold for primary key
+' green color for unique
+' and underscore for not_null
+' !define primary_key(x) <b>x</b>
+' !define unique(x) <color:green>x</color>
+' !define not_null(x) <u>x</u>
+' other tags available:
+' <i></i>
+' <back:COLOR></color>, where color is a color name or html color code
+' (#FFAACC)
+' see: http://plantuml.com/classes.html#More
+hide methods
+hide stereotypes
+
+' entities
+
+Table(orders, "orders\n(Заказы)")
+Table(users, "users\n(Пользователи)")
+Table(payments, "payments\n(Платежи)")
+Table(vm_configurations, "vm_configurations\n(Конфигурации ВМ)")
+Table(resources, "resources\n(Ресурс)")
+Table(resource_values, "resource_values\n(Значение ресурса)")
+Table(reports, "reports\n(Отчёты)")
+Table(report_values, "report_values\n(Значение отчёта)")
+Table(report_value_types, "report_value_types\n(Типы значений\nотчёта)")
+Table(collect_sessions, "collect_session\n(Сессия сбора\n оплат)")
+Table(error_logs, "error_logs\n(Ошибки важных\nпроцессов)")
+Table(process_types, "process_types\n(Тип процесса\nс описанием)")
+Table(order_snapshots, "order_snapshots\n(Слепки заказов \nс тарифами)")
+Table(report_types, "report_types\n(Типы отчётов)")
+
+resources "1" -- "*" resource_values
+resource_values "*" -- "1" vm_configurations 
+users "1" -- "*" payments 
+users "1" -- "*" orders
+orders "1" -- "*" payments
+vm_configurations "1" -left- "*" orders
+
+report_value_types "1" -- "*" report_values 
+reports "1" -- "*" report_values
+report_values "*" -- "1" orders
+report_values "*" -- "1" users
+
+collect_sessions "1" -- "*" error_logs
+reports "1" -- "*" error_logs
+process_types "1" -- "*" error_logs
+
+payments "1" -- "1" order_snapshots
+orders "*" -- "1" order_snapshots
+users "1" -- "*" order_snapshots
+
+collect_sessions "1" -- "*" payments
+
+report_types "1" -- "*" reports
+
+' email_messages
+' relationships
+' one-to-one relationship
+' user -- user_profile : "A user only \nhas one profile"
+' ' one to may relationship
+' user --> session : "A user may have\n many sessions"
+' ' many to many relationship
+' ' Add mark if you like
+' user "1" --> "*" user_group : "A user may be \nin many groups"
+' group "1" --> "0..N" user_group : "A group may \ncontain many users"
+
+
+@enduml
