@@ -1,12 +1,14 @@
-\chapter{Классы приложения}\label{app:A}
+\chapter{Классы логики приложения}\label{app:A}
 
-% Листинг~\ref{lst:external1} подгружается из внешнего файла. Приходится
-% загружать без окружения дополнительного. Иначе по страницам не переносится.
 \begingroup
 \captiondelim{ } % разделитель идентификатора с номером от наименования
-    \lstinputlisting[lastline=78,language={Ruby},caption={Листинг из внешнего файла},label={lst:external1}]{listings/my_class.rb}
+    \lstinputlisting[lastline=78,language={Ruby},caption={Модуль компонента управления заказами},label={lst:orders_module}]{listings/orders.rb}
 \endgroup
 
+\begingroup
+\captiondelim{ } % разделитель идентификатора с номером от наименования
+    \lstinputlisting[lastline=78,language={Ruby},caption={Модуль компонента управления ВМ},label={lst:vms_module}]{listings/vms.rb}
+\endgroup
 
 % Можно использовать первый для вставки небольших фрагментов
 % внутри текста, а второй для вставки полного
